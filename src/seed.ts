@@ -5,6 +5,8 @@ import { RolesService } from "./roles/roles.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Software } from "./softwares/entities/software.entity";
+import { User } from "./users/entities/user.entity";
+import { Role } from "./roles/entities/role.entity";
 import { faker } from "@faker-js/faker";
 
 async function bootstrap() {
@@ -13,21 +15,31 @@ async function bootstrap() {
   const rolesService = appContext.get(RolesService);
   const usersService = appContext.get(UsersService);
   const softwareRepository = appContext.get<Repository<Software>>(getRepositoryToken(Software));
+  const userRepository = appContext.get<Repository<User>>(getRepositoryToken(User));
+  const roleRepository = appContext.get<Repository<Role>>(getRepositoryToken(Role));
 
-  console.log("Starting seeding process...");
-
+  await softwareRepository.delete({});
+  await userRepository.delete({});
+  await roleRepository.delete({});
   // 1. 初始化角色
   const adminRole = await rolesService.create({
     name: "超级管理员",
     description: "System Administrator",
-    permissions: ["system-management", "user", "role", "mobile-management", "software"],
+    permissions: [
+      "dashboard",
+      "system-management",
+      "user",
+      "role",
+      "mobile-management",
+      "software",
+    ],
   });
   console.log("Seeded Admin Role");
 
   const normalRole = await rolesService.create({
     name: "普通用户",
     description: "Normal User",
-    permissions: ["mobile-management", "software"],
+    permissions: ["dashboard", "mobile-management", "software"],
   });
   console.log("Seeded Normal Role");
 
@@ -89,20 +101,6 @@ async function bootstrap() {
   } finally {
     // 关闭应用上下文
     console.log("Seeding process finished.");
-  }
-
-  try {
-    // 直接调用 Service 的 create 方法，它会自动加密密码
-    await usersService.create({
-      nickName: "超级管理员",
-      phone: "13333333333", // 账号
-      password: "123456", // 密码
-      email: "admin@example.com",
-      sex: "1",
-    });
-    console.log("创建成功！账号: 13333333333, 密码: 123456");
-  } catch (error) {
-    console.log("创建失败（可能已存在）:", error.message);
   }
 
   await appContext.close();
