@@ -94,8 +94,8 @@ export class UsersService {
 
     const flatList = list.map(item => ({
       ...item,
-      roleId: item.role ? item.role.id : null,
-      roleName: item.role ? item.role.name : null
+      roleId: item.role.id,
+      roleName: item.role.name
     }))
 
     return {

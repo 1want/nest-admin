@@ -7,31 +7,37 @@ import {
   Request,
   HttpCode,
   HttpStatus,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { AuthService } from "./auth.service";
-import { LoginDto } from "./dto/login.dto";
+  UnauthorizedException
+} from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport'
+import { AuthService } from './auth.service'
+import { LoginDto } from './dto/login.dto'
 
-@Controller("auth")
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(AuthGuard("jwt"))
-  @Get("profile")
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
   getProfile(@Request() req: any) {
-    return this.authService.getProfile(req.user.userId);
+    return this.authService.getProfile(req.user.userId)
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post("login")
+  @Post('login')
   async login(@Body() loginDto: LoginDto) {
     // 验证账号密码
-    const user = await this.authService.validateUser(loginDto.username, loginDto.password);
+    const user = await this.authService.validateUser(loginDto.username, loginDto.password)
     if (!user) {
-      throw new UnauthorizedException("用户名或密码错误");
+      throw new UnauthorizedException('用户名或密码错误')
     }
     // 签发 token
-    return this.authService.login(user); // user 已经去掉了密码
+    return this.authService.login(user) // user 已经去掉了密码
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout() {
+    return { message: 'Logout success' }
   }
 }
