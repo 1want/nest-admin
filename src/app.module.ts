@@ -5,6 +5,8 @@ import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
 import { Software } from "./softwares/entities/software.entity";
 import { User } from "./users/entities/user.entity";
+import { Role } from "./roles/entities/role.entity";
+import { RolesModule } from "./roles/roles.module";
 
 // brew services start postgresql 开启本地服务器
 @Module({
@@ -13,10 +15,10 @@ import { User } from "./users/entities/user.entity";
       type: "postgres", // 数据库类型
       host: "localhost", // 数据库主机名，如果是本地就是 localhost 或 127.0.0.1
       port: 5432,
-      username: "admin", // 你的数据库用户名
+      username: "wanti", // 你的数据库用户名
       password: "123456", // 你的数据库密码
       database: "postgres", // 你要连接的数据库名称
-      entities: [Software, User], // 列出所有需要 TypeORM 管理的实体类
+      entities: [Software, User, Role], // 列出所有需要 TypeORM 管理的实体类
       synchronize: true, // 开发环境下可以设为 true，它会自动根据实体创建数据库表（生产环境建议设为 false）
       // 其他 TypeORM 配置选项...
       // 例如，如果你想使用连接池:
@@ -28,6 +30,7 @@ import { User } from "./users/entities/user.entity";
     SoftwaresModule,
     UsersModule,
     AuthModule,
+    RolesModule,
   ],
 })
 export class AppModule {}

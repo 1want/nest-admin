@@ -1,21 +1,61 @@
 import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module"; // 导入主模块
+import { AppModule } from "./app.module";
+import { UsersService } from "./users/users.service";
+import { RolesService } from "./roles/roles.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Software } from "./softwares/entities/software.entity"; // 导入 Software 实体
-import { faker } from "@faker-js/faker"; // 导入 faker
+import { Software } from "./softwares/entities/software.entity";
+import { faker } from "@faker-js/faker";
 
 async function bootstrap() {
-  // 创建一个独立的 NestJS 应用上下文，不会启动 HTTP 服务器
   const appContext = await NestFactory.createApplicationContext(AppModule);
 
-  // 获取 Software Repository
+  const rolesService = appContext.get(RolesService);
+  const usersService = appContext.get(UsersService);
   const softwareRepository = appContext.get<Repository<Software>>(getRepositoryToken(Software));
 
   console.log("Starting seeding process...");
 
-  const softwaresToSeed: Partial<Software>[] = []; // 使用 Partial<Software> 或直接创建对象
-  const numberOfSoftwares = 20; // 要创建的软件数量
+  // 1. 初始化角色
+  const adminRole = await rolesService.create({
+    name: "超级管理员",
+    description: "System Administrator",
+    permissions: ["system-management", "user", "role", "mobile-management", "software"],
+  });
+  console.log("Seeded Admin Role");
+
+  const normalRole = await rolesService.create({
+    name: "普通用户",
+    description: "Normal User",
+    permissions: ["mobile-management", "software"],
+  });
+  console.log("Seeded Normal Role");
+
+  // 2. 初始化用户
+  // 创建管理员用户 (假设 UsersService.create 现在接受 roleId，如果 service 逻辑改了这里也要对应传递)
+  try {
+    await usersService.create({
+      nickName: "Admin",
+      phone: "13800138000",
+      password: "admin",
+      roleId: adminRole.id,
+    } as any);
+    console.log("Seeded Admin User: 13800138000 / admin");
+
+    await usersService.create({
+      nickName: "User",
+      phone: "13900139000",
+      password: "user",
+      roleId: normalRole.id,
+    } as any);
+    console.log("Seeded Normal User: 13900139000 / user");
+  } catch (e) {
+    console.log("Users might already exist, skipping...");
+  }
+
+  // 3. 初始化软件数据 (保留原有逻辑)
+  const softwaresToSeed: Partial<Software>[] = [];
+  const numberOfSoftwares = 20;
 
   for (let i = 0; i < numberOfSoftwares; i++) {
     const software = {
@@ -48,9 +88,24 @@ async function bootstrap() {
     console.error("Error seeding database:", error);
   } finally {
     // 关闭应用上下文
-    await appContext.close();
     console.log("Seeding process finished.");
   }
+
+  try {
+    // 直接调用 Service 的 create 方法，它会自动加密密码
+    await usersService.create({
+      nickName: "超级管理员",
+      phone: "13333333333", // 账号
+      password: "123456", // 密码
+      email: "admin@example.com",
+      sex: "1",
+    });
+    console.log("创建成功！账号: 13333333333, 密码: 123456");
+  } catch (error) {
+    console.log("创建失败（可能已存在）:", error.message);
+  }
+
+  await appContext.close();
 }
 
 bootstrap();

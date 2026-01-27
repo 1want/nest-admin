@@ -2,16 +2,26 @@ import {
   Body,
   Controller,
   Post,
+  Get,
+  UseGuards,
+  Request,
   HttpCode,
   HttpStatus,
   UnauthorizedException,
 } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @UseGuards(AuthGuard("jwt"))
+  @Get("profile")
+  getProfile(@Request() req: any) {
+    return this.authService.getProfile(req.user.userId);
+  }
 
   @HttpCode(HttpStatus.OK)
   @Post("login")

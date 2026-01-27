@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { AuthGuard } from "@nestjs/passport"; // 以后加登录验证用
@@ -14,8 +14,8 @@ export class UsersController {
 
   // 暂时先不想太复杂的权限，先做出接口
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: any) {
+    return this.usersService.findAll(query);
   }
 
   @Get(":id")
@@ -23,7 +23,7 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Patch(":id")
+  @Put(":id")
   update(@Param("id") id: string, @Body() updateUserDto: Partial<CreateUserDto>) {
     return this.usersService.update(+id, updateUserDto);
   }

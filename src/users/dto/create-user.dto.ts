@@ -18,4 +18,7 @@ export class CreateUserDto {
   // 密码可选，如果不传则后端默认设置
   @IsOptional()
   password?: string;
+
+  @IsOptional()
+  roleId?: string;
 }

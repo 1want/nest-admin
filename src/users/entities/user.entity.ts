@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from "typeorm";
+import { Role } from "../../roles/entities/role.entity";
 
 @Entity("sys_user")
 export class User {
@@ -41,4 +43,7 @@ export class User {
 
   @UpdateDateColumn()
   updateTime: Date;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role;
 }
