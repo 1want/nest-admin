@@ -25,7 +25,7 @@ async function bootstrap() {
   const adminRole = await rolesService.create({
     name: '超级管理员',
     description: 'System Administrator',
-    permissions: ['dashboard', 'system-management', 'user', 'role', 'mobile-management', 'software']
+    permissions: ['dashboard', 'mobile-management', 'software']
   })
   console.log('Seeded Admin Role')
 

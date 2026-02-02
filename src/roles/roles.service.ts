@@ -30,6 +30,7 @@ export class RolesService {
   async update(id: string, updateRoleDto: UpdateRoleDto) {
     const role = await this.findOne(id)
     this.rolesRepository.merge(role, updateRoleDto)
+
     return this.rolesRepository.save(role)
   }
 
