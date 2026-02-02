@@ -102,7 +102,7 @@ export class ApplicationsService {
     // 格式化返回数据
     const formattedList = list.map(item => this.formatApplication(item))
 
-    return { list: formattedList, total, pageNum: +pageNum, pageSize: +pageSize }
+    return { data: formattedList, total, pageNum: +pageNum, pageSize: +pageSize }
   }
 
   // 获取待审批列表（当前用户可审批的）
@@ -138,7 +138,7 @@ export class ApplicationsService {
 
     const formattedList = list.map(item => this.formatApplication(item))
 
-    return { list: formattedList, total, pageNum: +pageNum, pageSize: +pageSize }
+    return { data: formattedList, total, pageNum: +pageNum, pageSize: +pageSize }
   }
 
   // 获取单个申请详情
